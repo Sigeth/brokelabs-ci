@@ -15,6 +15,17 @@ const goVersion = "1.27.4"
 // licensesAllowed are the dependency licenses compatible with MIT (D14).
 const licensesAllowed = "MIT,Apache-2.0,BSD-2-Clause,BSD-3-Clause,ISC"
 
+// licensesIgnored are packages whose license go-licenses cannot classify,
+// checked by hand. Ignoring a package also skips its dependencies, so each
+// entry lists what only it pulls in.
+//   - in-toto (sigstore-go's DSSE verification): Apache-2.0, but the LICENSE
+//     files hold only the short notice. Only they pull in
+//     github.com/shibumi/go-pathspec (Apache-2.0).
+//   - json-canonicalization (sigstore-go's transparency log entries):
+//     Apache-2.0, short notice only; no dependencies.
+const licensesIgnored = "github.com/in-toto/attestation,github.com/in-toto/in-toto-golang," +
+	"github.com/cyberphone/json-canonicalization"
+
 // Go is the toolchain of a Go repository.
 type Go struct {
 	// +private
@@ -86,6 +97,6 @@ func (g *Go) Check(
 func (g *Go) Licenses(ctx context.Context) (string, error) {
 	return g.Container().
 		WithExec([]string{"go", "run", "github.com/google/go-licenses/v2@v2.0.1",
-			"check", "./...", "--allowed_licenses=" + licensesAllowed}).
+			"check", "./...", "--allowed_licenses=" + licensesAllowed, "--ignore=" + licensesIgnored}).
 		Stdout(ctx)
 }
