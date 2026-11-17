@@ -3,7 +3,7 @@ package main
 import (
 	"context"
 
-	"dagger/opslab-ci/internal/dagger"
+	"dagger/brokelabs-ci/internal/dagger"
 )
 
 // Nodejs is the toolchain of a Node.js (web) repository.
@@ -17,7 +17,7 @@ type Nodejs struct {
 }
 
 // Nodejs returns the Node.js toolchain for a repository.
-func (m *OpslabCi) Nodejs(
+func (m *BrokelabsCi) Nodejs(
 	// Repository root (with its Makefile and package.json).
 	// +ignore=["node_modules", "dist", "coverage", ".idea", ".vscode"]
 	source *dagger.Directory,
@@ -25,7 +25,7 @@ func (m *OpslabCi) Nodejs(
 	// +optional
 	// +default="24"
 	version string,
-	// Local checkout of opslab-api whose openapi.json generates the API
+	// Local checkout of brokelabs-api whose openapi.json generates the API
 	// client (sets OPENAPI_FILE for the Makefile).
 	// +optional
 	// +ignore=["*", "!openapi.json"]
@@ -38,7 +38,7 @@ func (n *Nodejs) base() *dagger.Container {
 	ctr := dag.Container(dagger.ContainerOpts{Platform: platform}).
 		From("docker.io/library/node:"+n.Version).
 		WithExec([]string{"git", "config", "--global", "--add", "safe.directory", "*"}).
-		WithMountedCache("/root/.npm", dag.CacheVolume("opslab-npm")).
+		WithMountedCache("/root/.npm", dag.CacheVolume("brokelabs-npm")).
 		WithEnvVariable("CI", "true").
 		WithMountedDirectory("/src", n.Source).
 		WithWorkdir("/src")

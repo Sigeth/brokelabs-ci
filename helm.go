@@ -3,7 +3,7 @@ package main
 import (
 	"context"
 
-	"dagger/opslab-ci/internal/dagger"
+	"dagger/brokelabs-ci/internal/dagger"
 )
 
 // Helm is the toolchain of a Helm chart repository.
@@ -19,7 +19,7 @@ type Helm struct {
 }
 
 // Helm returns the Helm toolchain for a chart repository.
-func (m *OpslabCi) Helm(
+func (m *BrokelabsCi) Helm(
 	// Repository root (with its Makefile).
 	// +ignore=["rendered", ".idea", ".vscode"]
 	source *dagger.Directory,
@@ -27,11 +27,11 @@ func (m *OpslabCi) Helm(
 	// +optional
 	// +default="4.3.1"
 	version string,
-	// Local checkout of opslab-core-go providing the CRDs (sets CORE_GO_DIR).
+	// Local checkout of brokelabs-core-go providing the CRDs (sets CORE_GO_DIR).
 	// +optional
 	// +ignore=["*", "!crds"]
 	coreGo *dagger.Directory,
-	// Local checkout of opslab-operator providing the RBAC role (sets OPERATOR_DIR).
+	// Local checkout of brokelabs-operator providing the RBAC role (sets OPERATOR_DIR).
 	// +optional
 	// +ignore=["*", "!config"]
 	operator *dagger.Directory,
@@ -74,11 +74,11 @@ func (h *Helm) Validate(
 	ctx context.Context,
 	// Directory of the chart's CRDs, relative to the source.
 	// +optional
-	// +default="opslab/crds"
+	// +default="brokelabs/crds"
 	crds string,
 	// Namespace the chart is rendered for (created before validation).
 	// +optional
-	// +default="opslab-system"
+	// +default="brokelabs-system"
 	namespace string,
 	// k3s image tag (Kubernetes version).
 	// +optional

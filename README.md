@@ -1,6 +1,6 @@
-# opslab-ci
+# brokelabs-ci
 
-Reusable [Dagger](https://dagger.io) pipelines for the opslab (working name) repositories.
+Reusable [Dagger](https://dagger.io) pipelines for the BrokeLabs repositories.
 
 Each repository keeps its build logic in its own `Makefile` (`lint`, `test`, `build`, `verify-generated`…). This module runs those targets in pinned linux/amd64 toolchain containers, so the result is the same on a laptop and in GitHub Actions. Repositories don't need their own Dagger module: their CI calls this one.
 
@@ -10,12 +10,12 @@ Each repository keeps its build logic in its own `Makefile` (`lint`, `test`, `bu
 |---|---|
 | `go --source=. check [--targets=lint,test,…]` | Go toolchain (golang image + make), runs Makefile targets |
 | `go --source=. licenses` | Fails on dependencies whose license is not MIT-compatible |
-| `rust --source=. [--postgres] check [--targets=lint,test,deny,…]` | Rust toolchain (rustfmt, clippy, cargo-deny, kopium), runs Makefile targets. `--postgres` starts PostgreSQL for the tests (`OPSLAB_TEST_DATABASE_URL`). |
+| `rust --source=. [--postgres] check [--targets=lint,test,deny,…]` | Rust toolchain (rustfmt, clippy, cargo-deny, kopium), runs Makefile targets. `--postgres` starts PostgreSQL for the tests (`BROKELABS_TEST_DATABASE_URL`). |
 | `nodejs --source=. check [--targets=lint,test,…]` | Node.js toolchain (`npm ci` from the lock file), runs Makefile targets |
 | `nodejs --source=. lock` | Resolves package.json in a container and returns package-lock.json (install scripts disabled) |
 | `helm --source=. check [--targets=lint,template,…]` | Helm toolchain, runs Makefile targets |
 | `helm --source=. validate` | Renders the chart and validates every manifest on k3s (server-side dry run) |
-| `challenge-lint --source=.` | `opslab challenge lint` on a challenge repository (`--cli`/`--core-go` to use local checkouts) |
+| `challenge-lint --source=.` | `brokelabs challenge lint` on a challenge repository (`--cli`/`--core-go` to use local checkouts) |
 | `image --source=.` | Builds the Dockerfile for linux/amd64 |
 | `vm-image --source=DIR [--source-image-archive=FILE]` | Builds a VM image recipe (`image.yaml`: a cloud image URL with its checksum, or a base containerDisk, plus scripts) into a KubeVirt containerDisk, with libguestfs (no KVM needed). `--source-image-archive` takes the base from an OCI/docker archive instead of pulling it (dev builds of unpublished bases). Then `export --path=disk.tar` or `publish --address=...` |
 | `crds --crds=crds --samples=samples --rejected=samples/invalid` | Starts k3s, installs the CRDs, and checks that samples are accepted and invalid ones rejected |
@@ -30,7 +30,7 @@ Before the shared libraries are published, or to try a contract change before ta
 
 ```sh
 # from a repository checkout
-dagger -m github.com/Sigeth/opslab-ci@v0.1.0 call go --source=. check --targets=lint,test,build
+dagger -m github.com/Sigeth/brokelabs-ci@v0.4.0 call go --source=. check --targets=lint,test,build
 ```
 
 GitHub Actions:
@@ -39,7 +39,7 @@ GitHub Actions:
 - uses: dagger/dagger-for-github@v8.4.1
   with:
     version: "0.21.11"
-    module: github.com/Sigeth/opslab-ci@v0.1.0
+    module: github.com/Sigeth/brokelabs-ci@v0.4.0
     verb: call
     args: go --source=. check --targets=lint,test
 ```

@@ -10,7 +10,7 @@ func TestParseRecipe(t *testing.T) {
 	if err != nil || r.Source.SHA512 != "abc" || len(r.Run) != 2 || r.Version != "1.0.0" {
 		t.Fatalf("recipe = %+v, %v", r, err)
 	}
-	if _, err := Parse([]byte("source: {image: ghcr.io/sigeth/opslab-images/debian-13@sha256:00}\n")); err != nil {
+	if _, err := Parse([]byte("source: {image: ghcr.io/sigeth/brokelabs-images/debian-13@sha256:00}\n")); err != nil {
 		t.Fatal(err)
 	}
 	for name, bad := range map[string]string{

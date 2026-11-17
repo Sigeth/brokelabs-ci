@@ -4,8 +4,8 @@ import (
 	"context"
 	"fmt"
 
-	"dagger/opslab-ci/internal/dagger"
-	"dagger/opslab-ci/internal/vmrecipe"
+	"dagger/brokelabs-ci/internal/dagger"
+	"dagger/brokelabs-ci/internal/vmrecipe"
 )
 
 // vmToolsImage is the base of the VM image toolchain.
@@ -18,7 +18,7 @@ const containerDiskUID = "107:107"
 // containerDisk: the source disk, customized offline by the recipe's scripts
 // (virt-customize), with a fresh machine-id, compressed. Publish it with
 // `publish --address=...` or save it with `export --path=disk.tar`.
-func (m *OpslabCi) VmImage(
+func (m *BrokelabsCi) VmImage(
 	ctx context.Context,
 	// Recipe directory (with image.yaml).
 	// +ignore=[".git", "*.qcow2", "*.tar"]

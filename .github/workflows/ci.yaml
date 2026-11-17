@@ -11,13 +11,13 @@ permissions:
 jobs:
   module:
     # The module must load, and its Kubernetes pipeline must work end to end
-    # on the CRDs of opslab-core-go.
+    # on the CRDs of brokelabs-core-go.
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
       - uses: actions/checkout@v5
         with:
-          repository: Sigeth/opslab-core-go
+          repository: Sigeth/brokelabs-core-go
           path: core-go
       - uses: dagger/dagger-for-github@v8.4.1
         with:

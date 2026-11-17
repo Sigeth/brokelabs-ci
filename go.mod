@@ -1,4 +1,4 @@
-module dagger/opslab-ci
+module dagger/brokelabs-ci
 
 go 1.27.3
 

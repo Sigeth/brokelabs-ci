@@ -4,7 +4,7 @@ import (
 	"context"
 	"time"
 
-	"dagger/opslab-ci/internal/dagger"
+	"dagger/brokelabs-ci/internal/dagger"
 )
 
 // K3sVersion is the default Kubernetes version CRDs are validated against.
@@ -13,7 +13,7 @@ const K3sVersion = "v1.37.2-k3s1"
 // k3s starts a k3s control plane (no kubelet: only the API server matters
 // here) and returns a client container with kubectl configured for it.
 func k3s(version, name string) *dagger.Container {
-	config := dag.CacheVolume("opslab-k3s-" + name)
+	config := dag.CacheVolume("brokelabs-k3s-" + name)
 	image := "docker.io/rancher/k3s:" + version
 
 	server := dag.Container(dagger.ContainerOpts{Platform: platform}).
@@ -37,7 +37,7 @@ func k3s(version, name string) *dagger.Container {
 		WithEnvVariable("KUBECONFIG", "/root/kubeconfig").
 		// Every run starts a new server with new certificates: never reuse a
 		// cached client setup.
-		WithEnvVariable("OPSLAB_K3S_RUN", time.Now().Format(time.RFC3339Nano)).
+		WithEnvVariable("BROKELABS_K3S_RUN", time.Now().Format(time.RFC3339Nano)).
 		// The shared volume may still hold the previous server's kubeconfig
 		// until the new one is written: re-read it on every attempt.
 		WithExec([]string{"sh", "-euc", `
@@ -54,7 +54,7 @@ echo "k3s did not become ready" >&2; exit 1`})
 // Crds installs CRDs on a real Kubernetes API server and server-side
 // validates sample objects against them (schemas and CEL rules are only fully
 // checked by an API server).
-func (m *OpslabCi) Crds(
+func (m *BrokelabsCi) Crds(
 	ctx context.Context,
 	// Directory of CustomResourceDefinition manifests.
 	crds *dagger.Directory,
@@ -66,7 +66,7 @@ func (m *OpslabCi) Crds(
 	rejected *dagger.Directory,
 	// Namespaces to create before applying the samples.
 	// +optional
-	// +default=["opslab-instances"]
+	// +default=["brokelabs-instances"]
 	namespaces []string,
 	// k3s image tag (Kubernetes version).
 	// +optional

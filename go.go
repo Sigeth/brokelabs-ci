@@ -3,10 +3,10 @@ package main
 import (
 	"context"
 
-	"dagger/opslab-ci/internal/dagger"
+	"dagger/brokelabs-ci/internal/dagger"
 )
 
-const coreGoModule = "github.com/Sigeth/opslab-core-go"
+const coreGoModule = "github.com/Sigeth/brokelabs-core-go"
 
 // goVersion is the default golang image tag; keep it in sync with the
 // +default of Go().
@@ -37,7 +37,7 @@ type Go struct {
 }
 
 // Go returns the Go toolchain for a repository.
-func (m *OpslabCi) Go(
+func (m *BrokelabsCi) Go(
 	// Repository root (with its Makefile).
 	// +ignore=["bin", "target", "node_modules", "dist", ".idea", ".vscode"]
 	source *dagger.Directory,
@@ -45,7 +45,7 @@ func (m *OpslabCi) Go(
 	// +optional
 	// +default="1.27.4"
 	version string,
-	// Local checkout of opslab-core-go used instead of the published module.
+	// Local checkout of brokelabs-core-go used instead of the published module.
 	// +optional
 	// +ignore=["bin", "target", "node_modules", "dist", ".idea", ".vscode"]
 	coreGo *dagger.Directory,
@@ -59,14 +59,14 @@ func (g *Go) Container() *dagger.Container {
 		From("docker.io/library/golang:"+g.Version).
 		WithExec([]string{"sh", "-c", "apt-get update -qq && apt-get install -y -qq --no-install-recommends make >/dev/null"}).
 		WithExec([]string{"git", "config", "--global", "--add", "safe.directory", "*"}).
-		WithMountedCache("/go/pkg/mod", dag.CacheVolume("opslab-go-mod")).
-		WithMountedCache("/root/.cache/go-build", dag.CacheVolume("opslab-go-build-"+g.Version)).
+		WithMountedCache("/go/pkg/mod", dag.CacheVolume("brokelabs-go-mod")).
+		WithMountedCache("/root/.cache/go-build", dag.CacheVolume("brokelabs-go-build-"+g.Version)).
 		WithEnvVariable("GOTOOLCHAIN", "local").
 		WithMountedDirectory("/src", g.Source).
 		WithWorkdir("/src")
 	if g.CoreGo != nil {
 		// A go.work outside the repository makes the local checkout replace
-		// the required version of opslab-core-go.
+		// the required version of brokelabs-core-go.
 		ctr = ctr.
 			WithMountedDirectory("/deps/core-go", g.CoreGo).
 			WithEnvVariable("GOWORK", "/deps/go.work").
