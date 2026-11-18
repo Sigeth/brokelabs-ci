@@ -5,10 +5,13 @@ import (
 	"errors"
 	"fmt"
 	"path"
+	"regexp"
 	"strings"
 
 	"sigs.k8s.io/yaml"
 )
+
+var sizePattern = regexp.MustCompile(`^[1-9][0-9]*[GM]$`)
 
 // File describes a VM image (D32): its source disk and the scripts
 // customizing it.
@@ -27,6 +30,10 @@ type Recipe struct {
 		// Image is a containerDisk to build on (a base image).
 		Image string `json:"image"`
 	} `json:"source"`
+	// Size is the virtual size the disk grows to before the scripts run,
+	// e.g. "10G" (optional): cloud images grow their root filesystem to it
+	// at first boot (cloud-init's growpart).
+	Size string `json:"size"`
 	// Run lists scripts (relative to the recipe) run as root in the disk, in
 	// order, with network access. The recipe directory is at /tmp/recipe
 	// while they run, and removed afterwards.
@@ -47,6 +54,9 @@ func Parse(data []byte) (*Recipe, error) {
 		return nil, errors.New(File + ": source.url needs exactly one of sha256 and sha512")
 	case s.Image != "" && (s.SHA256 != "" || s.SHA512 != ""):
 		return nil, errors.New(File + ": checksums apply to source.url only (pin source.image by digest)")
+	}
+	if r.Size != "" && !sizePattern.MatchString(r.Size) {
+		return nil, fmt.Errorf("%s: size %q must be a whole number of G or M (e.g. 10G)", File, r.Size)
 	}
 	for _, script := range r.Run {
 		if path.IsAbs(script) || strings.HasPrefix(path.Clean(script), "..") {

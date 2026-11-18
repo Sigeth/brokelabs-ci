@@ -21,6 +21,7 @@ func TestParseRecipe(t *testing.T) {
 		"checksum on an image": "source: {image: i, sha256: a}\n",
 		"escaping script":      "source: {image: i}\nrun: [../x.sh]\n",
 		"absolute script":      "source: {image: i}\nrun: [/x.sh]\n",
+		"bad size":             "source: {image: i}\nsize: 10GiB\n",
 		"unknown field":        "source: {image: i}\nscripts: [a.sh]\n",
 	} {
 		if _, err := Parse([]byte(bad)); err == nil || !strings.Contains(err.Error(), File) {

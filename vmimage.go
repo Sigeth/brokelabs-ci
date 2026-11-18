@@ -79,13 +79,18 @@ func (m *BrokelabsCi) VmImage(
 		WithMountedDirectory("/recipe", source).
 		WithFile("/work/source.qcow2", disk).
 		// A standalone copy: the source may have a backing file or be compressed.
-		WithExec([]string{"qemu-img", "convert", "-O", "qcow2", "/work/source.qcow2", "/work/disk.qcow2"}).
+		WithExec([]string{"qemu-img", "convert", "-O", "qcow2", "/work/source.qcow2", "/work/disk.qcow2"})
+	if r.Size != "" {
+		// qemu-img refuses to shrink a disk: a size below the source fails.
+		built = built.WithExec([]string{"qemu-img", "resize", "/work/disk.qcow2", r.Size})
+	}
+	out := built.
 		WithExec(args).
 		WithExec([]string{"qemu-img", "convert", "-c", "-O", "qcow2", "/work/disk.qcow2", "/work/out.qcow2"}).
 		File("/work/out.qcow2")
 
 	return dag.Container(dagger.ContainerOpts{Platform: platform}).
-		WithFile("/disk/disk.qcow2", built, dagger.ContainerWithFileOpts{Owner: containerDiskUID}), nil
+		WithFile("/disk/disk.qcow2", out, dagger.ContainerWithFileOpts{Owner: containerDiskUID}), nil
 }
 
 // vmTools is the VM image toolchain: libguestfs (with a kernel for its
